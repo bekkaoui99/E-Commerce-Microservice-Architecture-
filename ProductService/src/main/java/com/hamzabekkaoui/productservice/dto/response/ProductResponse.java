@@ -6,6 +6,7 @@ import lombok.Builder;
 public record ProductResponse(
         Long id,
         String title,
+        String productImageUrl,
         String description,
         Long quantity,
         Double price,

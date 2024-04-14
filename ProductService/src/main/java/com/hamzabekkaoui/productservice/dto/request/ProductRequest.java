@@ -8,6 +8,7 @@ import lombok.Builder;
 @Builder
 public record ProductRequest(
          String title,
+         String productImageUrl,
          String description,
          Long quantity,
          Double price,

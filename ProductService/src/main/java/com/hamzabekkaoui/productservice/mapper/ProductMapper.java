@@ -23,6 +23,7 @@ public class ProductMapper {
     public Product productRequestToProduct(ProductRequest productRequest){
         return Product.builder()
                 .title(productRequest.title())
+                .productImageUrl(productRequest.productImageUrl())
                 .description(productRequest.description())
                 .quantity(productRequest.quantity())
                 .price(productRequest.price())
@@ -34,6 +35,7 @@ public class ProductMapper {
         return ProductResponse.builder()
                 .id(product.getId())
                 .title(product.getTitle())
+                .productImageUrl(product.getProductImageUrl())
                 .description(product.getDescription())
                 .quantity(product.getQuantity())
                 .price(product.getPrice())
