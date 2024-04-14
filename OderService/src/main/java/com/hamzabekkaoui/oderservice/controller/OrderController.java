@@ -1,6 +1,7 @@
 package com.hamzabekkaoui.oderservice.controller;
 
 import com.hamzabekkaoui.oderservice.dto.request.OrderRequest;
+import com.hamzabekkaoui.oderservice.dto.response.OrderDetailsResponse;
 import com.hamzabekkaoui.oderservice.dto.response.OrderResponse;
 import com.hamzabekkaoui.oderservice.service.OrderService;
 import lombok.RequiredArgsConstructor;
@@ -41,12 +42,12 @@ public class OrderController {
     }
 
 
-    @PostMapping("/list")
+    @GetMapping("/list")
     public List<OrderResponse> getAllOrders(){
         return orderService.getAllOrders();
     }
 
-    @PostMapping("/page")
+    @GetMapping("/page")
     public Page<OrderResponse> getAllOrders(
             @RequestParam(name = "pageNumber" , defaultValue = "O") int pageNumber,
             @RequestParam(name = "pageSize" , defaultValue = "O") int pageSize
@@ -54,6 +55,24 @@ public class OrderController {
         return orderService.getAllOrders(pageNumber , pageSize);
     }
 
+
+    @PostMapping("/list/customer")
+    public List<OrderDetailsResponse> getAllOrdersForeachCustomer(
+            @RequestBody Map<String , String> request
+    ){
+        String customerName = request.get("customerName");
+        return orderService.getAllOrdersByCustomerName(customerName);
+    }
+
+    @PostMapping("/page/customer")
+    public Page<OrderDetailsResponse> getAllOrdersForeachCustomer(
+            @RequestBody Map<String , String> request,
+            @RequestParam(name = "pageNumber" , defaultValue = "O") int pageNumber,
+            @RequestParam(name = "pageSize" , defaultValue = "O") int pageSize
+    ){
+        String customerName = request.get("customerName");
+        return orderService.getAllOrdersByCustomerName(customerName,pageNumber , pageSize);
+    }
 
 
 

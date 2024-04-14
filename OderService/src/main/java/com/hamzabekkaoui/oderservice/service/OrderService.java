@@ -5,6 +5,7 @@ import com.hamzabekkaoui.oderservice.dto.request.CustomerApiRequest;
 import com.hamzabekkaoui.oderservice.dto.request.OrderRequest;
 import com.hamzabekkaoui.oderservice.dto.request.ProductApiRequest;
 import com.hamzabekkaoui.oderservice.dto.response.CustomerResponse;
+import com.hamzabekkaoui.oderservice.dto.response.OrderDetailsResponse;
 import com.hamzabekkaoui.oderservice.dto.response.OrderResponse;
 import com.hamzabekkaoui.oderservice.dto.response.ProductResponse;
 import org.springframework.data.domain.Page;
@@ -21,8 +22,12 @@ public interface OrderService {
 
     List<OrderResponse> getAllOrders();
     Page<OrderResponse> getAllOrders(int pageNumber , int pageSize);
+
+    List<OrderDetailsResponse> getAllOrdersByCustomerName(String customerName);
+    Page<OrderDetailsResponse> getAllOrdersByCustomerName(String customerName , int pageNumber , int pageSize);
     CustomerResponse getCustomerByUserName(CustomerApiRequest request) throws ResourceNotFoundException;
-    ProductResponse getProductByUserName(ProductApiRequest request) throws ResourceNotFoundException;
+    ProductResponse getProductByName(ProductApiRequest request) throws ResourceNotFoundException;
+
 
 
 }

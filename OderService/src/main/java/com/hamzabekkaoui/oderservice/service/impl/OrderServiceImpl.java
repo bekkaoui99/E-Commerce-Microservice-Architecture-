@@ -4,9 +4,7 @@ import com.hamzabekkaoui.oderservice.Exception.ResourceNotFoundException;
 import com.hamzabekkaoui.oderservice.dto.request.CustomerApiRequest;
 import com.hamzabekkaoui.oderservice.dto.request.OrderRequest;
 import com.hamzabekkaoui.oderservice.dto.request.ProductApiRequest;
-import com.hamzabekkaoui.oderservice.dto.response.CustomerResponse;
-import com.hamzabekkaoui.oderservice.dto.response.OrderResponse;
-import com.hamzabekkaoui.oderservice.dto.response.ProductResponse;
+import com.hamzabekkaoui.oderservice.dto.response.*;
 import com.hamzabekkaoui.oderservice.mapper.AddressMapper;
 import com.hamzabekkaoui.oderservice.model.Address;
 import com.hamzabekkaoui.oderservice.model.Order;
@@ -65,7 +63,7 @@ public class OrderServiceImpl implements OrderService {
         List<OrderItem> orderItem = orderRequest.orderItemRequests()
                 .stream()
                 .map(orderItemRequest -> {
-                    ProductResponse productByUserName = getProductByUserName(ProductApiRequest.builder()
+                    ProductResponse productByUserName = getProductByName(ProductApiRequest.builder()
                             .title(orderItemRequest.productName())
                             .build());
                     return OrderItem.builder()
@@ -163,6 +161,73 @@ public class OrderServiceImpl implements OrderService {
         return new PageImpl<>(orderResponseList , orders.getPageable() , orders.getTotalElements());
     }
 
+    @Override
+    public List<OrderDetailsResponse> getAllOrdersByCustomerName(String customerName) {
+
+        CustomerResponse customerByUserName = getCustomerByUserName(CustomerApiRequest.builder()
+                .userName(customerName)
+                .build());
+        List<Order> allOrders = orderRepository.findAllByCustomerId(customerByUserName.id());
+
+
+
+        return  allOrders.stream()
+                .map(order -> {
+                    return OrderDetailsResponse.builder()
+                            .id(order.getId())
+                            .orderCode(order.getOrderCode())
+                            .customerName(customerByUserName.userName())
+                            .orderStatus(order.getOrderStatus())
+                            .orderItemResponseList(order.getOrderItems().stream()
+                                    .map(orderItem -> {
+                                        return OrderItemResponse.builder()
+                                                .id(orderItem.getId())
+                                                .price(orderItem.getPrice())
+                                                .quantity(orderItem.getQuantity())
+                                                .total(orderItem.getTotal())
+                                                .productId(orderItem.getProductId())
+                                                .build();
+                                    }).collect(Collectors.toList()))
+                            .total(order.getTotal())
+                            .build();
+                }).collect(Collectors.toList());
+
+
+    }
+
+    @Override
+    public Page<OrderDetailsResponse> getAllOrdersByCustomerName(String customerName, int pageNumber, int pageSize) {
+
+        CustomerResponse customerByUserName = getCustomerByUserName(CustomerApiRequest.builder()
+                .userName(customerName)
+                .build());
+        Page<Order> allOrders = orderRepository.findAllByCustomerId(customerByUserName.id(), PageRequest.of(pageNumber, pageSize));
+
+        List<OrderDetailsResponse> orderDetailsResponseList = allOrders.getContent()
+                .stream()
+                .map(order -> {
+                    return OrderDetailsResponse.builder()
+                            .id(order.getId())
+                            .orderCode(order.getOrderCode())
+                            .customerName(customerByUserName.userName())
+                            .orderStatus(order.getOrderStatus())
+                            .orderItemResponseList(order.getOrderItems().stream()
+                                    .map(orderItem -> {
+                                        return OrderItemResponse.builder()
+                                                .id(orderItem.getId())
+                                                .price(orderItem.getPrice())
+                                                .quantity(orderItem.getQuantity())
+                                                .total(orderItem.getTotal())
+                                                .productId(orderItem.getProductId())
+                                                .build();
+                                    }).collect(Collectors.toList()))
+                            .total(order.getTotal())
+                            .build();
+                }).collect(Collectors.toList());
+
+        return new PageImpl<>(orderDetailsResponseList , allOrders.getPageable() , allOrders.getTotalElements());
+    }
+
 
     public CustomerResponse getCustomerByUserName(CustomerApiRequest request) throws ResourceNotFoundException{
         String url = "http://localhost:8081/api/v1/customers/ByUserName"; // Replace with your actual endpoint URL
@@ -179,7 +244,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public ProductResponse getProductByUserName(ProductApiRequest request) throws ResourceNotFoundException {
+    public ProductResponse getProductByName(ProductApiRequest request) throws ResourceNotFoundException {
         String url = "http://localhost:8082/api/v1/products/ByName";
         ResponseEntity<ProductResponse> response = restTemplate.postForEntity(url, request, ProductResponse.class);
 
